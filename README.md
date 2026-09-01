@@ -734,9 +734,7 @@ The Streamlit application was deployed online so that the model can be accessed 
 
 
 
-https://water-leakage-detector.streamlit.app/
-
-
+https://malusisibonda5-dev-water-leakage-detection-app-3ermxs.streamlit.app/
 
 
 
