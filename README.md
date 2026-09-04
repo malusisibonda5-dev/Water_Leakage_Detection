@@ -997,6 +997,77 @@ The trained model was saved and integrated into a Streamlit application, allowin
 
 
 The complete machine learning process and supporting analysis are available in the accompanying Jupyter Notebook.
+ PUMP_1 Forecasting
+
+The system also includes a time-series forecasting component for predicting future `PUMP_1` values.
+
+ Forecasting Approach
+
+The forecasting model uses historical `PUMP_1` values to predict future pump readings. Lag features were created from previous observations:
+
+* `PUMP_1_lag1` – previous 5 minutes
+* `PUMP_1_lag2` – previous 10 minutes
+* `PUMP_1_lag3` – previous 15 minutes
+* `PUMP_1_lag6` – previous 30 minutes
+* `PUMP_1_lag12` – previous 1 hour
+* `PUMP_1_lag24` – previous 2 hours
+
+The data was split chronologically into:
+
+* **76% Training**
+* **12% Validation**
+* **12% Testing**
+
+Several forecasting approaches were evaluated, including a Naïve Baseline, Linear Regression, and Random Forest.
+
+ Model Performance
+
+| Model             |    MAE |   RMSE |
+| ----------------- | -----: | -----: |
+| Naïve Baseline    | 0.3234 | 3.6732 |
+| Linear Regression | 0.5979 | 3.6575 |
+| Random Forest     | 0.6612 | 3.7129 |
+
+Linear Regression was selected as the final **machine-learning forecasting model** because it achieved the lowest RMSE among the tested machine-learning models.
+
+On the final test set, Linear Regression achieved:
+
+* **MAE:** 0.5984
+* **RMSE:** 3.6431
+
+ 24-Hour Forecast
+
+The Streamlit application can generate a *24-hour PUMP_1 forecast* using the trained Linear Regression model.
+
+Since the dataset contains measurements at *5-minute intervals*, a 24-hour forecast contains:
+
+**288 forecast points**
+
+The forecasting process uses recursive prediction, where predicted values are fed back into the model as lag values for subsequent predictions.
+
+The forecasting model and required historical values are stored as:
+
+
+pump1_forecast_model.pkl
+pump1_history.pkl
+
+
+The forecasting notebook is available in:
+
+
+water_flows.ipynb
+
+
+ Streamlit Forecasting Features
+
+The application provides:
+
+ 24-hour PUMP_1 forecast
+ Forecast visualization
+ Forecast value table
+ Starting forecast value
+ Ending forecast value
+ Total number of forecast points
 
 
 
