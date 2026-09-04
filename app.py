@@ -9,6 +9,9 @@ import joblib
 model = joblib.load("final_model.pkl")
 scaler = joblib.load("scaler.pkl")
 
+forecast_model = joblib.load("pump1_forecast_model.pkl")
+forecast_history = joblib.load("pump1_history.pkl")
+
 # ---------------------------------------------------
 # Page configuration
 # ---------------------------------------------------
@@ -146,3 +149,90 @@ if st.button("Predict Leakage"):
         st.write(
             f"No Leakage Probability: {(1 - probability):.2%}"
         )
+# ---------------------------------------------------
+# PUMP_1 24-Hour Forecast
+# ---------------------------------------------------
+
+st.divider()
+
+st.header("📈 PUMP_1 24-Hour Forecast")
+
+st.write(
+    "Generate a 24-hour forecast of PUMP_1 "
+    "using the trained forecasting model."
+)
+
+if st.button("Generate 24-Hour Forecast"):
+
+    history = forecast_history.copy()
+
+    future_predictions = []
+
+    feature_names = [
+        "PUMP_1_lag1",
+        "PUMP_1_lag2",
+        "PUMP_1_lag3",
+        "PUMP_1_lag6",
+        "PUMP_1_lag12",
+        "PUMP_1_lag24"
+    ]
+
+    # Generate 288 predictions
+    for _ in range(288):
+
+        features = pd.DataFrame([[
+            history[-1],
+            history[-2],
+            history[-3],
+            history[-6],
+            history[-12],
+            history[-24]
+        ]], columns=feature_names)
+
+        prediction = forecast_model.predict(features)[0]
+
+        future_predictions.append(prediction)
+
+        history.append(prediction)
+
+    # Create future timestamps
+    future_timestamps = pd.date_range(
+        start=pd.Timestamp("2019-01-01 00:00:00"),
+        periods=288,
+        freq="5min"
+    )
+
+    # Create forecast DataFrame
+    future_forecast_df = pd.DataFrame(
+        {
+            "PUMP_1_Forecast": future_predictions
+        },
+        index=future_timestamps
+    )
+
+    # Display graph
+    st.subheader("Forecast")
+
+    st.line_chart(
+        future_forecast_df["PUMP_1_Forecast"]
+    )
+
+    # Display forecast table
+    st.subheader("Forecast Values")
+
+    st.dataframe(
+        future_forecast_df
+    )
+
+    # Summary
+    st.write(
+        f"Starting Forecast: {future_predictions[0]:.2f}"
+    )
+
+    st.write(
+        f"Ending Forecast: {future_predictions[-1]:.2f}"
+    )
+
+    st.write(
+        f"Forecast Points: {len(future_predictions)}"
+    )
